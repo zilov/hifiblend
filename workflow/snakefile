@@ -1,0 +1,60 @@
+from pathlib import Path, PurePath
+
+# read config
+
+OUTDIR = config["outdir"]
+FASTA = config["fasta"]
+BAM = config["bam"]
+ASSEMBLER = config["assembler"]
+BUSCO_LINEAGE = config["busco_lineage"]
+THREADS = ["threads"]
+HAPLOMERGE = ["haplomerge"]
+MERGE_TOOL = ["merge_tool"]
+
+READS = FASTA or BAM
+
+PREFIX = PurePath(READS).stem
+
+rule all:
+    input:
+        quast = f"{OUTDIR}/quast/{PREFIX}_result.txt"
+        busco =  f"{OUTDIR}/busco/{PREFIX}_specific.txt" if BUSCO_LINEAGE else "",
+        
+rule envs:
+    params:
+        hifiasm = "../envs/repeatmodeler.yaml",
+        flye = "../envs/bedtools.yaml",
+        canu = "../envs/braker.yaml",
+        lja = "../envs/star.yaml",
+        verkko = "../envs/eggnog.yaml",
+        busco = "../envs/busco.yaml",
+        quast = "../envs/quast.yaml",
+      
+envs = rules.envs.params
+
+if ASSEMBLER == "hifiasm":
+    include: "../rules/hifiasm.smk"
+    ASSEMBLY = rules.hifiasm.output.ASSEMBLY
+elif ASSEMBLER == "flye":
+    include: "../rules/flye.smk"
+    ASSEMBLY = rules.flye.output.ASSEMBLY
+elif ASSEMBLER == "canu":
+    include: "../rules/canu.smk"
+    ASSEMBLY = rules.canu.output.ASSEMBLY
+elif ASSEMBLER == "lja":
+    include: "../rules/lja.smk"
+    ASSEMBLY = rules.lja.output.ASSEMBLY
+elif ASSEMBLER == "verkko":
+    include: "../rules/verkko.smk"
+    ASSEMBLY = rules.verkko.output.ASSEMBLY
+
+if HAPLOMERGE:
+    if MERGE_TOOL == 'purgedups':
+        include: "../rules/purgedups.smk"
+    elif MERGE_TOOL == 'mabs':
+        include: "../rules/mabs.smk"
+
+include: "../rules/quast.smk"
+
+if BUSCO_LINEAGE:
+    include: "../rules/busco.smk"
