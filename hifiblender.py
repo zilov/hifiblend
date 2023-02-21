@@ -33,8 +33,6 @@ def config_maker(settings, config_file):
       
 
 def main(settings):
-    ''' Function description.
-    '''
         
     if settings["debug"]:
         snake_debug = "-n"
@@ -46,7 +44,7 @@ def main(settings):
     snakemake --snakefile {settings["execution_folder"]}/workflow/snakefile \
               --configfile {settings["config_file"]} \
               --cores {settings["threads"]} \
-              --use-conda {snake_debug}"""
+              --use-conda --conda-frontend mamba {snake_debug}"""
     print(command)
     os.system(command)
 
@@ -56,7 +54,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='hifiblender: snakemake pipeline for genome assembly with HiFi reads and its QC')
     parser.add_argument('-a','--assembler', help="assembler to use [default == hifiasm]", 
                         choices=["hifiasm", "flye", "canu", "lja", "verkko"], default="hifiasm")
-    parser.add_argument('-f','--fasta', help="path to HiFi reads in fasta-format", default="")
+    parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
     parser.add_argument('--bam', help="path to HiFi reads in BAM format", default="")
     parser.add_argument('-h', '--merge-haplotips', 'Merge haplotips of resulting assembly',  action='store_true')
     parser.add_argument('--merge-haplotips-tool', help='Tool to merge haplotips [default == purgedups]', choices=['purgedups'], default='purgedups')
@@ -71,14 +69,14 @@ if __name__ == '__main__':
     threads = args["threads"]
     debug = args["debug"]
     assembler = args["assembler"]
-    fasta = args["fasta"]
+    fastq = args["fastq"]
     bam = args["bam"]
-    haplomerge = argparse['merge-haplotips']
-    merge_tool = argparse['merge-haplotips-tool']
+    haplomerge = args['merge-haplotips']
+    merge_tool = args['merge-haplotips-tool']
     busco_lineage = args["busco_lineage"]
     outdir = os.path.abspath(args["outdir"])
     
-    assert(fasta or bam), "Reads in FASTA of BAM format are required"
+    assert(fastq or bam), "Reads in FASTA of BAM format are required"
     
     execution_folder = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
     execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
@@ -89,7 +87,7 @@ if __name__ == '__main__':
         "outdir" : outdir,
         "threads" : threads,
         "assembler" : assembler,
-        "fasta": fasta,
+        "fastq": fastq,
         "bam" : bam,
         "execution_folder" : execution_folder,
         "debug" : debug,
