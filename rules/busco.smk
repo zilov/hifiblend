@@ -1,6 +1,6 @@
 rule busco:
     input:
-        anno_faa = rules.braker.output.braker_out_aa
+        ASSEMBLY
     conda:
         envs.busco
     threads: workflow.cores
@@ -17,9 +17,9 @@ rule busco:
        busco \
              --offline \
              -l {params.lineage} \
-             -i {input.anno_faa} \
+             -i {input} \
              -o busco \
-             -m prot \
+             -m genome \
              -f \
              -c {threads}
              
