@@ -17,7 +17,7 @@ PREFIX = PurePath(READS).stem
 
 rule all:
     input:
-        quast = f"{OUTDIR}/quast/report.txt"
+        quast = f"{OUTDIR}/quast/report.txt",
         busco =  f"{OUTDIR}/busco/{PREFIX}_specific.txt" if BUSCO_LINEAGE else "",
         
 rule envs:
@@ -29,12 +29,12 @@ rule envs:
         verkko = "../envs/eggnog.yaml",
         busco = "../envs/busco.yaml",
         quast = "../envs/quast.yaml",
+        gfatools = "../envs/gfatools.yaml"
       
 envs = rules.envs.params
 
 if ASSEMBLER == "hifiasm":
     include: "../rules/hifiasm.smk"
-    ASSEMBLY = rules.hifiasm.output.assembly
 elif ASSEMBLER == "flye":
     include: "../rules/flye.smk"
     ASSEMBLY = rules.flye.output.assembly
