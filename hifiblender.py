@@ -16,11 +16,12 @@ import random
 def config_maker(settings, config_file):
     config = f"""
     "outdir" : "{settings["outdir"]}"
-    "forward_read" : "{settings["fr"]}"
-    "reverse_read" : "{settings["rr"]}"
-    "assembler" : "{settings["mode"]}"
+    "assembler" : "{settings["assembler"]}"
+    "fastq" : "{settings["fastq"]}"
+    "bam" : "{settings["bam"]}"
     "threads" : "{settings["threads"]}"
     "busco_lineage": "{settings["busco_lineage"]}"
+    "execution_folder" : "{settings["execution_folder"]}"
     """
 
     if not os.path.exists(os.path.dirname(config_file)):
@@ -56,8 +57,8 @@ if __name__ == '__main__':
                         choices=["hifiasm", "flye", "canu", "lja", "verkko"], default="hifiasm")
     parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
     parser.add_argument('--bam', help="path to HiFi reads in BAM format", default="")
-    parser.add_argument('-h', '--merge-haplotips', 'Merge haplotips of resulting assembly',  action='store_true')
-    parser.add_argument('--merge-haplotips-tool', help='Tool to merge haplotips [default == purgedups]', choices=['purgedups'], default='purgedups')
+    parser.add_argument('-m','--merge_haplotips', help='Merge haplotips of resulting assembly', action='store_true')
+    parser.add_argument('--merge_haplotips_tool', help='Tool to merge haplotips [default == purgedups]', choices=['purgedups'], default='purgedups')
     parser.add_argument('-b','--busco_lineage', help="path to busco lineage database folder", default="")
     parser.add_argument('-o','--outdir', help='output directory', required=True)
     parser.add_argument('-t','--threads', help='number of threads [default == 8]', default = "8")
@@ -65,14 +66,13 @@ if __name__ == '__main__':
     parser.add_argument('-d','--debug', help='debug mode', action='store_true')
     args = vars(parser.parse_args())
 
-    assembly_fasta = os.path.abspath(args["assembly"])
     threads = args["threads"]
     debug = args["debug"]
     assembler = args["assembler"]
     fastq = args["fastq"]
     bam = args["bam"]
-    haplomerge = args['merge-haplotips']
-    merge_tool = args['merge-haplotips-tool']
+    haplomerge = args['merge_haplotips']
+    merge_tool = args['merge_haplotips_tool']
     busco_lineage = args["busco_lineage"]
     outdir = os.path.abspath(args["outdir"])
     
@@ -82,6 +82,9 @@ if __name__ == '__main__':
     execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     random_letters = "".join([random.choice(string.ascii_letters) for n in range(3)])
     config_file = os.path.join(execution_folder, f"config/config_{random_letters}{execution_time}.yaml")
+    
+    if busco_lineage:
+        busco_lineage = os.path.abspath(busco_lineage)
             
     settings = {
         "outdir" : outdir,
