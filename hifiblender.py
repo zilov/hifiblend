@@ -22,6 +22,8 @@ def config_maker(settings, config_file):
     "threads" : "{settings["threads"]}"
     "busco_lineage": "{settings["busco_lineage"]}"
     "execution_folder" : "{settings["execution_folder"]}"
+    "fr": "{settings["fr"]}"
+    "rr": "{settings["rr"]}"
     """
 
     if not os.path.exists(os.path.dirname(config_file)):
@@ -54,8 +56,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='hifiblender: snakemake pipeline for genome assembly with HiFi reads and its QC')
     parser.add_argument('-a','--assembler', help="assembler to use [default == hifiasm]", 
-                        choices=["hifiasm", "flye", "canu", "lja", "verkko"], default="hifiasm")
+                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "verkko"], default="hifiasm")
     parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
+    parser.add_argument('-1','--forward_hic_read', help="path to forward hic read", default="")
+    parser.add_argument('-2','--reverse_hic_read', help="path to reverse hic read", default="")
     parser.add_argument('--bam', help="path to HiFi reads in BAM format", default="")
     parser.add_argument('-m','--merge_haplotips', help='Merge haplotips of resulting assembly', action='store_true')
     parser.add_argument('--merge_haplotips_tool', help='Tool to merge haplotips [default == purgedups]', choices=['purgedups'], default='purgedups')
@@ -75,6 +79,8 @@ if __name__ == '__main__':
     merge_tool = args['merge_haplotips_tool']
     busco_lineage = args["busco_lineage"]
     outdir = os.path.abspath(args["outdir"])
+    forward_hic_read = args["forward_hic_read"]
+    reverse_hic_read = args["reverse_hic_read"]
     
     assert(fastq or bam), "Reads in FASTA of BAM format are required"
     
@@ -83,6 +89,15 @@ if __name__ == '__main__':
     random_letters = "".join([random.choice(string.ascii_letters) for n in range(3)])
     config_file = os.path.join(execution_folder, f"config/config_{random_letters}{execution_time}.yaml")
     
+    if assembler == "hifiasm_hic":
+        if not (forward_hic_read or reverse_hic_read):
+            parser.error("\nhifiasm_hic mode requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}!")
+        else:
+            forward_hic_read = os.path.abspath(forward_hic_read)
+            reverse_hic_read = os.path.abspath(reverse_hic_read)
+    if (forward_hic_read or reverse_hic_read) and assembler != "hifiasm_hic":
+         parser.error("\nONLY hifiasm_hic mode requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}! Please change run mode!")
+    
     if busco_lineage:
         busco_lineage = os.path.abspath(busco_lineage)
             
@@ -90,10 +105,12 @@ if __name__ == '__main__':
         "outdir" : outdir,
         "threads" : threads,
         "assembler" : assembler,
+        "fr" : forward_hic_read, 
+        "rr" : reverse_hic_read,
         "fastq": fastq,
         "bam" : bam,
         "execution_folder" : execution_folder,
-        "debug" : debug,
+        "debug" : debug,        
         "config_file" : config_file,
         "busco_lineage" : busco_lineage,
     }

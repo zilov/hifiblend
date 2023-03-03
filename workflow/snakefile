@@ -7,9 +7,12 @@ FASTQ = config["fastq"]
 BAM = config["bam"]
 ASSEMBLER = config["assembler"]
 BUSCO_LINEAGE = config["busco_lineage"]
-THREADS = ["threads"]
-HAPLOMERGE = ["haplomerge"]
-MERGE_TOOL = ["merge_tool"]
+THREADS = config["threads"]
+#HAPLOMERGE = config["haplomerge"]
+#MERGE_TOOL = config["merge_tool"]
+HIC_FR = config['fr']
+HIC_RR = config['rr']
+
 
 READS = FASTQ or BAM
 
@@ -35,6 +38,8 @@ envs = rules.envs.params
 
 if ASSEMBLER == "hifiasm":
     include: "../rules/hifiasm.smk"
+if ASSEMBLER == "hifiasm_hic":
+    include: "../rules/hifiasm_hic.smk"
 elif ASSEMBLER == "flye":
     include: "../rules/flye.smk"
     ASSEMBLY = rules.flye.output.assembly
@@ -48,11 +53,11 @@ elif ASSEMBLER == "verkko":
     include: "../rules/verkko.smk"
     ASSEMBLY = rules.verkko.output.assembly
 
-if HAPLOMERGE:
-    if MERGE_TOOL == 'purgedups':
-        include: "../rules/purgedups.smk"
-    elif MERGE_TOOL == 'mabs':
-        include: "../rules/mabs.smk"
+# if HAPLOMERGE:
+#     if MERGE_TOOL == 'purgedups':
+#         include: "../rules/purgedups.smk"
+#     elif MERGE_TOOL == 'mabs':
+#         include: "../rules/mabs.smk"
 
 include: "../rules/quast.smk"
 
