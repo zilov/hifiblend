@@ -1,8 +1,8 @@
 rule quast:
     input:
-        ASSEMBLY
+        ASSEMBLY,
     conda:
-        envs.quast
+        envs.quast,
     output:
         quast_output = "{OUTDIR}/quast/report.txt"
     params:

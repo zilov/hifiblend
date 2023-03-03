@@ -26,9 +26,9 @@ rule all:
 rule envs:
     params:
         hifiasm = "../envs/hifiasm.yaml",
-        flye = "../envs/bedtools.yaml",
-        canu = "../envs/braker.yaml",
-        lja = "../envs/star.yaml",
+        flye = "../envs/flye.yaml",
+        canu = "../envs/canu.yaml",
+        lja = "../envs/lja.yaml",
         verkko = "../envs/eggnog.yaml",
         busco = "../envs/busco.yaml",
         quast = "../envs/quast.yaml",
