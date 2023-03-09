@@ -12,6 +12,7 @@ THREADS = config["threads"]
 #MERGE_TOOL = config["merge_tool"]
 HIC_FR = config['fr']
 HIC_RR = config['rr']
+LJA = config['lja']
 
 
 READS = FASTQ or BAM

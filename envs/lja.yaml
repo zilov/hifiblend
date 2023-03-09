@@ -1,0 +1,9 @@
+channels:
+- conda-forge
+- defaults
+- anaconda 
+dependencies:
+ - gcc=12.2.0
+ - cmake=3.22.1
+ - make=4.3
+ - zlib=1.2.13

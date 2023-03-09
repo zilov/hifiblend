@@ -24,6 +24,7 @@ def config_maker(settings, config_file):
     "execution_folder" : "{settings["execution_folder"]}"
     "fr": "{settings["fr"]}"
     "rr": "{settings["rr"]}"
+    "lja": "{settings["lja"]}"
     """
 
     if not os.path.exists(os.path.dirname(config_file)):
@@ -88,6 +89,7 @@ if __name__ == '__main__':
     execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     random_letters = "".join([random.choice(string.ascii_letters) for n in range(3)])
     config_file = os.path.join(execution_folder, f"config/config_{random_letters}{execution_time}.yaml")
+    lja_bin = os.path.join(execution_folder, "./scripts/LJA/bin/lja")
     
     if assembler == "hifiasm_hic":
         if not (forward_hic_read or reverse_hic_read):
@@ -110,7 +112,8 @@ if __name__ == '__main__':
         "fastq": fastq,
         "bam" : bam,
         "execution_folder" : execution_folder,
-        "debug" : debug,        
+        "lja": lja_bin,
+        "debug" : debug,            
         "config_file" : config_file,
         "busco_lineage" : busco_lineage,
     }
