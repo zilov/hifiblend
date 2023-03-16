@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='hifiblender: snakemake pipeline for genome assembly with HiFi reads and its QC')
     parser.add_argument('-a','--assembler', help="assembler to use [default == hifiasm]", 
-                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "verkko"], default="hifiasm")
+                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "platanus"], default="hifiasm")
     parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
     parser.add_argument('-1','--forward_hic_read', help="path to forward hic read", default="")
     parser.add_argument('-2','--reverse_hic_read', help="path to reverse hic read", default="")
@@ -83,6 +83,11 @@ if __name__ == '__main__':
     reverse_hic_read = args["reverse_hic_read"]
     
     assert(fastq or bam), "Reads in FASTA of BAM format are required"
+    
+    if fastq:
+        fastq = os.path.abspath(fastq)
+    elif bam:
+        bam = os.path.abspath(bam)
     
     execution_folder = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
     execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
