@@ -12,7 +12,7 @@ THREADS = config["threads"]
 #MERGE_TOOL = config["merge_tool"]
 HIC_FR = config['fr']
 HIC_RR = config['rr']
-LJA = config['lja']
+EXECUTION_FOLDER = config['execution_folder']
 
 
 READS = FASTQ or BAM
@@ -33,9 +33,16 @@ rule envs:
         verkko = "../envs/eggnog.yaml",
         busco = "../envs/busco.yaml",
         quast = "../envs/quast.yaml",
-        gfatools = "../envs/gfatools.yaml"
-      
+        gfatools = "../envs/gfatools.yaml",
+        platanus = "../envs/platanus.yaml",
+
 envs = rules.envs.params
+
+rule local:
+    params:
+        platanus = f"{EXECUTION_FOLDER}/scripts/platanus_allee",
+
+local = rules.local.params
 
 if ASSEMBLER == "hifiasm":
     include: "../rules/hifiasm.smk"
@@ -50,9 +57,9 @@ elif ASSEMBLER == "canu":
 elif ASSEMBLER == "lja":
     include: "../rules/lja.smk"
     ASSEMBLY = rules.lja.output.assembly
-elif ASSEMBLER == "verkko":
-    include: "../rules/verkko.smk"
-    ASSEMBLY = rules.verkko.output.assembly
+elif ASSEMBLER == "platanus":
+    include: "../rules/platanus.smk"
+    ASSEMBLY = rules.platanus_consensus.output.assembly
 
 # if HAPLOMERGE:
 #     if MERGE_TOOL == 'purgedups':
