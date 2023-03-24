@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='hifiblender: snakemake pipeline for genome assembly with HiFi reads and its QC')
     parser.add_argument('-a','--assembler', help="assembler to use [default == hifiasm]", 
-                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "platanus"], default="hifiasm")
+                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja"], default="hifiasm")
     parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
     parser.add_argument('-1','--forward_hic_read', help="path to forward hic read", default="")
     parser.add_argument('-2','--reverse_hic_read', help="path to reverse hic read", default="")

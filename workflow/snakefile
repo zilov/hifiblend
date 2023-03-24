@@ -35,15 +35,8 @@ rule envs:
         busco = "../envs/busco.yaml",
         quast = "../envs/quast.yaml",
         gfatools = "../envs/gfatools.yaml",
-        platanus = "../envs/platanus.yaml",
 
 envs = rules.envs.params
-
-rule local:
-    params:
-        platanus = f"{EXECUTION_FOLDER}/scripts/platanus_allee",
-
-local = rules.local.params
 
 if ASSEMBLER == "hifiasm":
     include: "../rules/hifiasm.smk"
@@ -58,9 +51,6 @@ elif ASSEMBLER == "canu":
 elif ASSEMBLER == "lja":
     include: "../rules/lja.smk"
     ASSEMBLY = rules.lja.output.assembly
-elif ASSEMBLER == "platanus":
-    include: "../rules/platanus.smk"
-    ASSEMBLY = rules.platanus_consensus.output.assembly
 
 # if HAPLOMERGE:
 #     if MERGE_TOOL == 'purgedups':
