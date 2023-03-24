@@ -10,7 +10,7 @@ rule platanus_assembly:
         outdir = directory(f"{OUTDIR}/platanus"),
         tmpdir = directory(f"{OUTDIR}/platanus/tmp"),
         platanus = local.platanus
-    shell: "cd {params.outdir} && {params.platanus} assemble -f {input.reads} -m 100 -s 250 -t {threads} 2>assembly.log"
+    shell: "cd {params.outdir} && {params.platanus} assemble -f {input.reads} -m 100 -s 250 -K 0.1 -t {threads} 2>assembly.log"
 
 rule platanus_phase:
     input: 
