@@ -25,6 +25,7 @@ def config_maker(settings, config_file):
     "fr": "{settings["fr"]}"
     "rr": "{settings["rr"]}"
     "lja": "{settings["lja"]}"
+    "genome_size": "{settings["genome_size"]}"
     """
 
     if not os.path.exists(os.path.dirname(config_file)):
@@ -67,6 +68,7 @@ if __name__ == '__main__':
     parser.add_argument('-b','--busco_lineage', help="path to busco lineage database folder", default="")
     parser.add_argument('-o','--outdir', help='output directory', required=True)
     parser.add_argument('-t','--threads', help='number of threads [default == 8]', default = "8")
+    parser.add_argument('-g','--genome_size', help='genome size, e.g. 3.7m or 2.8g (required only for canu run)', default = "")
     parser.add_argument('-p', '--prefix', help='Run prefix [default == reads prefix]', default='')
     parser.add_argument('-d','--debug', help='debug mode', action='store_true')
     args = vars(parser.parse_args())
@@ -82,6 +84,7 @@ if __name__ == '__main__':
     outdir = os.path.abspath(args["outdir"])
     forward_hic_read = args["forward_hic_read"]
     reverse_hic_read = args["reverse_hic_read"]
+    genome_size = args["genome_size"]
     
     assert(fastq or bam), "Reads in FASTA of BAM format are required"
     
@@ -102,6 +105,8 @@ if __name__ == '__main__':
         else:
             forward_hic_read = os.path.abspath(forward_hic_read)
             reverse_hic_read = os.path.abspath(reverse_hic_read)
+    elif assembler == "canu" and not genome_size:
+            parser.error("\ncanu mode requires genome size! E.g. -g 2.8m or -g 3.5g :)")
     if (forward_hic_read or reverse_hic_read) and assembler != "hifiasm_hic":
          parser.error("\nONLY hifiasm_hic mode requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}! Please change run mode!")
     
@@ -121,6 +126,7 @@ if __name__ == '__main__':
         "debug" : debug,            
         "config_file" : config_file,
         "busco_lineage" : busco_lineage,
+        "genome_size": genome_size,
     }
     
     config_maker(settings, config_file)

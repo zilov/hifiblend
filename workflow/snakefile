@@ -13,6 +13,7 @@ THREADS = config["threads"]
 HIC_FR = config['fr']
 HIC_RR = config['rr']
 EXECUTION_FOLDER = config['execution_folder']
+GENOME_SIZE = config['genome_size']
 
 
 READS = FASTQ or BAM
