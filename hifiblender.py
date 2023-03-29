@@ -12,30 +12,17 @@ from inspect import getsourcefile
 from datetime import datetime
 import string
 import random
+import yaml
 
 def config_maker(settings, config_file):
-    config = f"""
-    "outdir" : "{settings["outdir"]}"
-    "assembler" : "{settings["assembler"]}"
-    "fastq" : "{settings["fastq"]}"
-    "bam" : "{settings["bam"]}"
-    "threads" : "{settings["threads"]}"
-    "busco_lineage": "{settings["busco_lineage"]}"
-    "execution_folder" : "{settings["execution_folder"]}"
-    "fr": "{settings["fr"]}"
-    "rr": "{settings["rr"]}"
-    "lja": "{settings["lja"]}"
-    "genome_size": "{settings["genome_size"]}"
-    """
-
+    
     if not os.path.exists(os.path.dirname(config_file)):
         os.mkdir(os.path.dirname(config_file))
 
-
-    with open(config_file, "w") as fw:
-        fw.write(config)
+    with open(config_file, "w") as f:
+        yaml.dump(settings, f)
         print(f"CONFIG IS CREATED! {config_file}")
-      
+
 
 def main(settings):
         
@@ -69,6 +56,8 @@ if __name__ == '__main__':
     parser.add_argument('-o','--outdir', help='output directory', required=True)
     parser.add_argument('-t','--threads', help='number of threads [default == 8]', default = "8")
     parser.add_argument('-g','--genome_size', help='genome size, e.g. 3.7m or 2.8g (required only for canu run)', default = "")
+    parser.add_argument('--coverage', help="additionally perform read alignment and coverage counting for assembly", default=False, action='store_true')
+    parser.add_argument('--assembly', help="run qc/coverage only on completed assembly", default=False)
     parser.add_argument('-p', '--prefix', help='Run prefix [default == reads prefix]', default='')
     parser.add_argument('-d','--debug', help='debug mode', action='store_true')
     args = vars(parser.parse_args())
@@ -85,19 +74,23 @@ if __name__ == '__main__':
     forward_hic_read = args["forward_hic_read"]
     reverse_hic_read = args["reverse_hic_read"]
     genome_size = args["genome_size"]
+    coverage = args["coverage"]
+    assembly = args['assembly']
     
-    assert(fastq or bam), "Reads in FASTA of BAM format are required"
+    if not assembly:
+        assert(fastq or bam), "Reads in FASTA of BAM format are required"
+    else:
+        if coverage:
+            assert(fastq or bam), "Reads in FASTA of BAM format are required for building coverage"
+    
     
     if fastq:
         fastq = os.path.abspath(fastq)
     elif bam:
         bam = os.path.abspath(bam)
-    
-    execution_folder = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
-    execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-    random_letters = "".join([random.choice(string.ascii_letters) for n in range(3)])
-    config_file = os.path.join(execution_folder, f"config/config_{random_letters}{execution_time}.yaml")
-    lja_bin = os.path.join(execution_folder, "./scripts/LJA/bin/lja")
+    if assembly:
+        assembly = os.path.abspath(assembly)
+        
     
     if assembler == "hifiasm_hic":
         if not (forward_hic_read or reverse_hic_read):
@@ -112,6 +105,11 @@ if __name__ == '__main__':
     
     if busco_lineage:
         busco_lineage = os.path.abspath(busco_lineage)
+        
+    execution_folder = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
+    execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    config_file = os.path.join(execution_folder, f"config/config_{execution_time}.yaml")
+    lja_bin = os.path.join(execution_folder, "./scripts/LJA/bin/lja")
             
     settings = {
         "outdir" : outdir,
@@ -127,6 +125,8 @@ if __name__ == '__main__':
         "config_file" : config_file,
         "busco_lineage" : busco_lineage,
         "genome_size": genome_size,
+        "coverage": coverage,
+        "assembly": assembly,
     }
     
     config_maker(settings, config_file)
