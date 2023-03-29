@@ -16,6 +16,8 @@ EXECUTION_FOLDER = config['execution_folder']
 GENOME_SIZE = config['genome_size']
 COVERAGE = config['coverage']
 ASSEMBLY = config['assembly']
+SCAFFOLD = config['scaffold']
+REFERENCE = config['reference']
 
 READS = FASTQ or BAM
 
@@ -39,6 +41,7 @@ rule envs:
         quast = "../envs/quast.yaml",
         gfatools = "../envs/gfatools.yaml",
         coverage = "../envs/coverage.yaml",
+        ragtag = "../envs/ragtag.yaml"
 
 envs = rules.envs.params
 
@@ -72,3 +75,6 @@ if BUSCO_LINEAGE:
 
 if COVERAGE:
     include: "../rules/count_coverage.smk"
+
+if SCAFFOLD:
+    include: "../rules/scaffold.smk"

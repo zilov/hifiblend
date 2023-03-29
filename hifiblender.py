@@ -58,6 +58,8 @@ if __name__ == '__main__':
     parser.add_argument('-g','--genome_size', help='genome size, e.g. 3.7m or 2.8g (required only for canu run)', default = "")
     parser.add_argument('--coverage', help="additionally perform read alignment and coverage counting for assembly", default=False, action='store_true')
     parser.add_argument('--assembly', help="run qc/coverage only on completed assembly", default=False)
+    parser.add_argument('--scaffold', help="scaffold with RagTag (reference is required)", default=False, action='store_true')
+    parser.add_argument('-r', '--reference', help="reference genome for scaffolding of draft assembly", default=False)
     parser.add_argument('-p', '--prefix', help='Run prefix [default == reads prefix]', default='')
     parser.add_argument('-d','--debug', help='debug mode', action='store_true')
     args = vars(parser.parse_args())
@@ -76,6 +78,8 @@ if __name__ == '__main__':
     genome_size = args["genome_size"]
     coverage = args["coverage"]
     assembly = args['assembly']
+    reference = args['reference']
+    scaffold = args['scaffold']
     
     if not assembly:
         assert(fastq or bam), "Reads in FASTA of BAM format are required"
@@ -90,6 +94,8 @@ if __name__ == '__main__':
         bam = os.path.abspath(bam)
     if assembly:
         assembly = os.path.abspath(assembly)
+    if reference:
+        reference = os.path.abspath(reference)
         
     
     if assembler == "hifiasm_hic":
@@ -105,6 +111,9 @@ if __name__ == '__main__':
     
     if busco_lineage:
         busco_lineage = os.path.abspath(busco_lineage)
+    
+    if scaffold and not reference:
+        assert(reference), 'Reference fasta required to scaffold draft genome'    
         
     execution_folder = os.path.dirname(os.path.abspath(getsourcefile(lambda: 0)))
     execution_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
@@ -127,6 +136,8 @@ if __name__ == '__main__':
         "genome_size": genome_size,
         "coverage": coverage,
         "assembly": assembly,
+        "reference": reference,
+        "scaffold": scaffold
     }
     
     config_maker(settings, config_file)
