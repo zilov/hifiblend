@@ -1,4 +1,4 @@
-rule hifiasm:
+rule hifiasm_hic:
     input: 
         hifi_reads = READS,
         hic_forward = HIC_FR,
@@ -13,7 +13,7 @@ rule hifiasm:
 
 rule gfa_to_fa:
     input: 
-        gfa = rules.hifiasm.output.assembly_gfa
+        gfa = rules.hifiasm_hic.output.assembly_gfa
     conda: envs.gfatools
     output:
         assembly_fa = f"{OUTDIR}/hifiasm/{PREFIX}.bp.p_ctg.fa"
