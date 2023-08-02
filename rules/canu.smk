@@ -11,5 +11,5 @@ rule canu:
         prefix = PREFIX,
         genome_size = GENOME_SIZE,
     shell: """
-    canu -p {params.prefix} -d {params.outdir} genomeSize={params.genome_size} useGrid=false -pacbio-hifi {input.reads}
+    canu -p {params.prefix} -d {params.outdir} genomeSize={params.genome_size} useGrid=false -pacbio-hifi {input.reads} correctedErrorRate=0.005 minOverlapLength=2500 minReadLength=2500
     """
