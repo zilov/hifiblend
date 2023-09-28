@@ -7,4 +7,4 @@ rule lja:
         assembly = f"{OUTDIR}/lja/assembly.fasta"
     params: 
         outdir = directory(f"{OUTDIR}/lja"),
-    shell: "%s -o {params.outdir} -t {threads} --reads {input}" % LJA
+    shell: "lja -o {params.outdir} -t {threads} --reads {input}"
