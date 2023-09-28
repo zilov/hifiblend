@@ -26,6 +26,7 @@ PREFIX = PurePath(READS).stem
 rule all:
     input:
         #coverage = f"{OUTDIR}/alignment/{PREFIX}_coverage.bed" if COVERAGE else "",
+        #scaffold = f"{OUTDIR}/ragtag/ragtag.correct.fasta" if SCAFFOLD else "",
         quast = f"{OUTDIR}/quast/report.txt",
         busco =  f"{OUTDIR}/busco/{PREFIX}_specific.txt" if BUSCO_LINEAGE else "",
         
@@ -36,22 +37,22 @@ rule envs:
         flye = "../envs/flye.yaml",
         canu = "../envs/canu.yaml",
         lja = "../envs/lja.yaml",
-        verkko = "../envs/eggnog.yaml",
         busco = "../envs/busco.yaml",
         quast = "../envs/quast.yaml",
         gfatools = "../envs/gfatools.yaml",
         coverage = "../envs/coverage.yaml",
-        ragtag = "../envs/ragtag.yaml"
+        ragtag = "../envs/ragtag.yaml",
+        verkko = "../envs/verkko.yaml"
 
 envs = rules.envs.params
 
 if not ASSEMBLY:
     if ASSEMBLER == "hifiasm":
         include: "../rules/hifiasm.smk"
-        ASSEMBLY = rules.hifiasm.output.assembly
+        ASSEMBLY = rules.gfa_to_fa.output.assembly_fa
     elif ASSEMBLER == "hifiasm_hic":
         include: "../rules/hifiasm_hic.smk"
-        ASSEMBLY = rules.hifiasm_hic.output.assembly
+        ASSEMBLY = rules.gfa_to_fa.output.assembly_fa
     elif ASSEMBLER == "flye":
         include: "../rules/flye.smk"
         ASSEMBLY = rules.flye.output.assembly
@@ -61,12 +62,22 @@ if not ASSEMBLY:
     elif ASSEMBLER == "lja":
         include: "../rules/lja.smk"
         ASSEMBLY = rules.lja.output.assembly
+    elif ASSEMBLER == "verkko":
+        include: "../rules/verkko.smk"
+        ASSEMBLY = rules.verkko.output.assembly
+    elif ASSEMBLER == "verkko_hic":
+        include: "../rules/verkko_hic.smk"
+        ASSEMBLY = rules.verkko_hic.output.assembly
 
 # if HAPLOMERGE:
 #     if MERGE_TOOL == 'purgedups':
 #         include: "../rules/purgedups.smk"
 #     elif MERGE_TOOL == 'mabs':
 #         include: "../rules/mabs.smk"
+
+if SCAFFOLD:
+    include: "../rules/scaffold.smk"
+    ASSEMBLY = rules.correct.output
 
 include: "../rules/quast.smk"
 
@@ -75,6 +86,3 @@ if BUSCO_LINEAGE:
 
 if COVERAGE:
     include: "../rules/count_coverage.smk"
-
-if SCAFFOLD:
-    include: "../rules/scaffold.smk"

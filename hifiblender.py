@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='hifiblender: snakemake pipeline for genome assembly with HiFi reads and its QC')
     parser.add_argument('-a','--assembler', help="assembler to use [default == hifiasm]", 
-                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "verkko"], default="hifiasm")
+                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "verkko", "verkko_hic"], default="hifiasm")
     parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
     parser.add_argument('-1','--forward_hic_read', help="path to forward hic read", default="")
     parser.add_argument('-2','--reverse_hic_read', help="path to reverse hic read", default="")
@@ -98,16 +98,16 @@ if __name__ == '__main__':
         reference = os.path.abspath(reference)
         
     
-    if assembler == "hifiasm_hic":
+    if assembler in ["hifiasm_hic", "verkko_hic"]:
         if not (forward_hic_read or reverse_hic_read):
-            parser.error("\nhifiasm_hic mode requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}!")
+            parser.error("\nhifiasm_hic and verkko_hic mode requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}!")
         else:
             forward_hic_read = os.path.abspath(forward_hic_read)
             reverse_hic_read = os.path.abspath(reverse_hic_read)
     elif assembler == "canu" and not genome_size:
             parser.error("\ncanu mode requires genome size! E.g. -g 2.8m or -g 3.5g :)")
-    if (forward_hic_read or reverse_hic_read) and assembler != "hifiasm_hic":
-         parser.error("\nONLY hifiasm_hic mode requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}! Please change run mode!")
+    if (forward_hic_read or reverse_hic_read) and assembler not in ["hifiasm_hic", "verkko_hic"]:
+         parser.error("\nONLY hifiasm_hic and verkko modes requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}! Please change run mode!")
     
     if busco_lineage:
         busco_lineage = os.path.abspath(busco_lineage)
