@@ -16,5 +16,3 @@ rule gfa_to_fa:
     output:
         assembly_fa = f"{OUTDIR}/hifiasm/{PREFIX}.bp.p_ctg.fa"
     shell: 'gfatools gfa2fa {input.gfa} > {output.assembly_fa}'
-
-ASSEMBLY = rules.gfa_to_fa.output.assembly_fa
