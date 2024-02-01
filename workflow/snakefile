@@ -42,7 +42,8 @@ rule envs:
         gfatools = "../envs/gfatools.yaml",
         coverage = "../envs/coverage.yaml",
         ragtag = "../envs/ragtag.yaml",
-        verkko = "../envs/verkko.yaml"
+        verkko = "../envs/verkko.yaml",
+        nextdenovo = "../envs/nextdenovo.yaml"
 
 envs = rules.envs.params
 
@@ -68,6 +69,9 @@ if not ASSEMBLY:
     elif ASSEMBLER == "verkko_hic":
         include: "../rules/verkko_hic.smk"
         ASSEMBLY = rules.verkko_hic.output.assembly
+    elif ASSEMBLER == "nextdenovo":
+        include: "../rules/nextdenovo.smk"
+        ASSEMBLY = rules.nextdenovo.output.assembly
 
 # if HAPLOMERGE:
 #     if MERGE_TOOL == 'purgedups':

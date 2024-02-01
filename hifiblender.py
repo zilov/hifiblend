@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='hifiblender: snakemake pipeline for genome assembly with HiFi reads and its QC')
     parser.add_argument('-a','--assembler', help="assembler to use [default == hifiasm]", 
-                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "verkko", "verkko_hic"], default="hifiasm")
+                        choices=["hifiasm", "hifiasm_hic", "flye", "canu", "lja", "verkko", "verkko_hic", "nextdenovo"], default="hifiasm")
     parser.add_argument('-f','--fastq', help="path to HiFi reads in fastq-format", default="")
     parser.add_argument('-1','--forward_hic_read', help="path to forward hic read", default="")
     parser.add_argument('-2','--reverse_hic_read', help="path to reverse hic read", default="")
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('-b','--busco_lineage', help="path to busco lineage database folder", default="")
     parser.add_argument('-o','--outdir', help='output directory', required=True)
     parser.add_argument('-t','--threads', help='number of threads [default == 8]', default = "8")
-    parser.add_argument('-g','--genome_size', help='genome size, e.g. 3.7m or 2.8g (required only for canu run)', default = "")
+    parser.add_argument('-g','--genome_size', help='genome size, e.g. 3.7m or 2.8g (required for canu and nextdenovo run)', default = "")
     parser.add_argument('--coverage', help="additionally perform read alignment and coverage counting for assembly", default=False, action='store_true')
     parser.add_argument('--assembly', help="run qc/coverage only on completed assembly", default=False)
     parser.add_argument('--scaffold', help="scaffold with RagTag (reference is required)", default=False, action='store_true')
@@ -104,8 +104,8 @@ if __name__ == '__main__':
         else:
             forward_hic_read = os.path.abspath(forward_hic_read)
             reverse_hic_read = os.path.abspath(reverse_hic_read)
-    elif assembler == "canu" and not genome_size:
-            parser.error("\ncanu mode requires genome size! E.g. -g 2.8m or -g 3.5g :)")
+    elif assembler in  ["canu", "nextdenovo"] and not genome_size:
+            parser.error("\ncanu and nextdenovo mode requires genome size! E.g. -g 2.8m or -g 3.5g :)")
     if (forward_hic_read or reverse_hic_read) and assembler not in ["hifiasm_hic", "verkko_hic"]:
          parser.error("\nONLY hifiasm_hic and verkko modes requires -1 {path_to_forward_read} and -2 {path_to_reverse_read}! Please change run mode!")
     
