@@ -1,0 +1,3 @@
+[submodule "scripts/slizer"]
+	path = scripts/slizer
+	url = https://github.com/zilov/slizer
