@@ -64,17 +64,19 @@ hifiblender.py --assembly my_assembly.fasta -o output_dir -f reads.fastq -k 21
 `-t/--threads`: Number of threads to use. Default is 8.
 `-sv/--sv_analysis`: Perform structural variant analysis with Sniffles.
 
-`-c/--coverage`: Calculate coverage and generate reports with SLiZer.
+`-c/--coverage`: Calculate coverage and generate reports with slizer.
 
 `-k`: K-mer size for QV analysis with Meryl. Default is 21.
 ### Output:
 hifiblender generates the assembled genome (in assembly modes) and various QC metrics in the specified output directory.
 Intermediate files from each tool are preserved and organized by tool name for further analysis.
+
+Summary of QC is in `{PREFIX}_final_qc.tsv` file.
 ### Tools Used
 hifiblender utilizes various bioinformatics tools, including:
-- Assemblers: hifiasm, flye, canu, lja, verkko, nextdenovo
-- QC Tools: QUAST, BUSCO, Meryl, slizer, Sniffles, Merfin, GenomeScope2.0
-- Alignment: minimap2
-- Other: samtools, bcftools, seqtk
+- Assemblers: [hifiasm](https://github.com/chhylp123/hifiasm), [flye](https://github.com/fenderglass/Flye), [canu](https://github.com/marbl/canu), [lja](https://github.com/AntonBankevich/LJA), [verkko](https://github.com/marbl/verkko), [nextdenovo](https://github.com/Nextomics/NextDenovo)
+- QC Tools: [QUAST](https://github.com/ablab/quast), [BUSCO](https://busco.ezlab.org/), [Meryl](https://github.com/marbl/meryl), [slizer](https://github.com/zilov/slizer), [Sniffles](https://github.com/fritzsedlazeck/Sniffles), [Merfin](https://github.com/arangrhie/merfin), [GenomeScope2.0](https://github.com/schatzlab/genomescope)
+- Alignment: [minimap2](https://github.com/lh3/minimap2)
+- Other: [samtools](https://github.com/samtools/samtools), [bcftools](https://github.com/samtools/bcftools), [seqtk](https://github.com/lh3/seqtk)
 
 **We welcome contributions and feedback to further improve hifiblender!**
