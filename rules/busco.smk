@@ -5,7 +5,7 @@ rule busco:
         envs.busco
     threads: workflow.cores
     output:
-        f"{OUTDIR}/busco/{PREFIX}_specific.txt"
+        specific_txt = f"{OUTDIR}/busco/{PREFIX}_specific.txt"
     params:
         lineage = BUSCO_LINEAGE,
         outdir = OUTDIR,

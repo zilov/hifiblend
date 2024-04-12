@@ -1,15 +1,8 @@
-from pathlib import Path, PurePath
-
-# read config
-
 OUTDIR = config["outdir"]
 FASTQ = config["fastq"]
-BAM = config["bam"]
 ASSEMBLER = config["assembler"]
 BUSCO_LINEAGE = config["busco_lineage"]
 THREADS = config["threads"]
-#HAPLOMERGE = config["haplomerge"]
-#MERGE_TOOL = config["merge_tool"]
 HIC_FR = config['fr']
 HIC_RR = config['rr']
 EXECUTION_FOLDER = config['execution_folder']
@@ -18,18 +11,17 @@ COVERAGE = config['coverage']
 ASSEMBLY = config['assembly']
 SCAFFOLD = config['scaffold']
 REFERENCE = config['reference']
+PREFIX = config['prefix']
+K = config["k"]
+MERYL_DB = config["meryl_db"]
+SV = config["sv"]
 
-READS = FASTQ or BAM
-
-PREFIX = PurePath(READS).stem
+READS = FASTQ
 
 rule all:
     input:
-        #coverage = f"{OUTDIR}/alignment/{PREFIX}_coverage.bed" if COVERAGE else "",
-        #scaffold = f"{OUTDIR}/ragtag/ragtag.correct.fasta" if SCAFFOLD else "",
-        quast = f"{OUTDIR}/quast/report.txt",
-        busco =  f"{OUTDIR}/busco/{PREFIX}_specific.txt" if BUSCO_LINEAGE else "",
-        
+        qc_final = f"{OUTDIR}/{PREFIX}_final_qc.tsv"
+
         
 rule envs:
     params:
@@ -43,7 +35,13 @@ rule envs:
         coverage = "../envs/coverage.yaml",
         ragtag = "../envs/ragtag.yaml",
         verkko = "../envs/verkko.yaml",
-        nextdenovo = "../envs/nextdenovo.yaml"
+        nextdenovo = "../envs/nextdenovo.yaml",
+        merfin = "../envs/merfin.yaml",
+        genomescope = "../envs/genomescope.yaml",
+        slizer = "../envs/slizer.yaml",
+        minimap2 = "../envs/minimap2.yaml",
+        sniffles = "../envs/sniffles.yaml"
+
 
 envs = rules.envs.params
 
@@ -51,12 +49,12 @@ if not ASSEMBLY:
     if ASSEMBLER == "hifiasm":
         include: "../rules/hifiasm.smk"
         ASSEMBLY = rules.gfa_to_fa.output.assembly_fa
-    elif ASSEMBLER == "hifiasm_hic":
-        include: "../rules/hifiasm_hic.smk"
-        ASSEMBLY = rules.gfa_to_fa.output.assembly_fa
     elif ASSEMBLER == "flye":
         include: "../rules/flye.smk"
         ASSEMBLY = rules.flye.output.assembly
+    elif ASSEMBLER == "hifiasm_hic":
+        include: "../rules/hifiasm_hic.smk"
+        ASSEMBLY = rules.gfa_to_fa.output.assembly_fa
     elif ASSEMBLER == "canu":
         include: "../rules/canu.smk"
         ASSEMBLY = rules.canu.output.assembly
@@ -73,11 +71,6 @@ if not ASSEMBLY:
         include: "../rules/nextdenovo.smk"
         ASSEMBLY = rules.nextdenovo.output.assembly
 
-# if HAPLOMERGE:
-#     if MERGE_TOOL == 'purgedups':
-#         include: "../rules/purgedups.smk"
-#     elif MERGE_TOOL == 'mabs':
-#         include: "../rules/mabs.smk"
 
 if SCAFFOLD:
     include: "../rules/scaffold.smk"
@@ -88,5 +81,20 @@ include: "../rules/quast.smk"
 if BUSCO_LINEAGE:
     include: "../rules/busco.smk"
 
+if COVERAGE or SV:
+    include: "../rules/minimap2_align.smk"
+
 if COVERAGE:
-    include: "../rules/count_coverage.smk"
+    include: "../rules/slizer.smk"
+
+if SV:
+    include: "../rules/sniffles.smk"
+
+if not MERYL_DB:
+    include: "../rules/build_meryl_reads_db.smk"
+    MERYL_DB = rules.meryl_build_db.output.meryl_db_folder
+
+include: "../rules/meryl.smk"
+include: "../rules/genomescope.smk"
+include: "../rules/merfin.smk"
+include: "../rules/combine_qc.smk"

@@ -1,0 +1,9 @@
+channels:
+- bioconda
+- conda-forge
+- defaults 
+- anaconda
+dependencies:
+ - samtools=1.12
+ - minimap2
+ - ncurses=6.2

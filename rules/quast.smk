@@ -4,7 +4,7 @@ rule quast:
     conda:
         envs.quast,
     output:
-        quast_output = "{OUTDIR}/quast/report.txt"
+        quast_output = f"{OUTDIR}/quast/report.tsv"
     params:
-        directory("{OUTDIR}/quast")
+        directory(f"{OUTDIR}/quast")
     shell: "quast -o {params} {input}"
