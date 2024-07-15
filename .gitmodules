@@ -1,3 +1,6 @@
 [submodule "scripts/slizer"]
 	path = scripts/slizer
 	url = https://github.com/zilov/slizer
+[submodule "scripts/genomescope2.0"]
+	path = scripts/genomescope2.0
+	url = https://github.com/tbenavi1/genomescope2.0.git
